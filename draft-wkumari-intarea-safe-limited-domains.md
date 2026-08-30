@@ -2,7 +2,7 @@
 title: "Safe(r) Limited Domains"
 abbrev: "safer-limited-domains"
 docname: draft-wkumari-intarea-safe-limited-domains-latest
-category: std
+category: info
 submissionType: IETF
 
 ipr: trust200902
@@ -83,7 +83,7 @@ allow protocols that are designed to operate in a limited domain "fail-closed"
 rather than "fail-open", thereby making these protocols safer to deploy on the
 Internet.
 
-These mechanism are not applicable to all protocols intended for use in a
+These mechanisms are not applicable to all protocols intended for use in a
 limited domain, but if implemented on certain classes of protocols, they  can
 significantly reduce the risks.
 
@@ -134,7 +134,7 @@ In addition, {{RFC8799}} Section 6, notes:
 
 This document discusses some of the mechanisms which protocol designers can
 use to limit the scope of their protocols to a single link. If the protocol is
-intended to be used in across multiple links, but should not be forwarded
+intended to be used across multiple links, but should not be forwarded
 beyond a single administrative domain, then the protocol designer should
 consider making the protocol "fail-closed" rather than "fail-open", as
 described below.
@@ -163,7 +163,7 @@ intended to be used within a single LAN segment.
 
 * Transport type service (for example MPLS and SRv6): These protocols are
 intended to provide a transport service, and are intended to remain
-within a single administrative domain such as a Enterprise or a Service
+within a single administrative domain such as an Enterprise or a Service
 Provider network.
 
 # Fail-open versus Fail-closed
@@ -212,7 +212,7 @@ the subnet. This is because routers will decrement the Hop-Limit of packets by
 1 when forwarding them, and discard the packet when it reaches zero.
 
 The approach of setting the IP Hop-Limit to 1 ensures that the protocol does
-leave the subnet. This is different from requiring the received IP Hop-Limit
+not leave the subnet. This is different from requiring the received IP Hop-Limit
 has a value of 255, as used in {{RFC3682}}, which ensures that traffic cannot
 be spoofed from outside the subnet.
 
@@ -226,7 +226,7 @@ Block {{RFC5771}}, (224.0.0/24). In addition to providing a discovery
 mechanism, this traffic is not forwarded off-link, providing a simple and
 effective way to limit the scope of the protocol.
 
-In some (rare) cases, IPv4 "Link Local" addresses ({{RFC3927}} may be an
+In some (rare) cases, IPv4 "Link Local" addresses {{RFC3927}} may be an
 appropriate mechanism to limit the scope of the protocol, but this
 such a niche case that it is not discussed further here.
 
@@ -256,7 +256,7 @@ deeper in the frame such as IP addresses or IP protocol or header options.
 This layer-2 protocol identifier technique only works for transport-type
 limited domain protocols (i.e., protocols running at layer 3).  Higher layer
 protocols cannot necessarily be protected in this way, and so cryptographically
-enforced mechanisms may need to be used instead (e.g., as done used by ANIMA in
+enforced mechanisms may need to be used instead (e.g., as done by ANIMA in
 {{RFC8994}} and {{RFC8995}}).
 
 # Ethernet Protocol Identification
@@ -277,12 +277,12 @@ unsigned 16-bit field in an Ethernet frame with a value in the range of 0x0600
 to 0xFFFF, and so it is a somewhat limited resource; however, there exists a
 special Extended EtherType (0x88B7) that can be suffixed by an Organizationally
 Unique Identifier (OUI) followed by a further 16-bits identifying the protocol
-relative to that OUI as discussed in Section 3 of [RFC9542]. These alternatives
-of a direct EtherType or use of the Extended EtherType for the case of the IANA
-OUI are illustrated in Figure 2. The following subsections discuss the factors
-which may influence the choice between these alternatives when use of such
-layer 2 protocol identification, to make the isolation of a limited domain more
-robust, is warranted.
+relative to that OUI as discussed in Section 3 of {{RFC9542}}. These
+alternatives of a direct EtherType or use of the Extended EtherType for the
+case of the IANA OUI are illustrated in Figure 2. The following subsections
+discuss the factors which may influence the choice between these alternatives
+when use of such layer 2 protocol identification, to make the isolation of a
+limited domain more robust, is warranted.
 
       01234567 01234567
     +--------+--------+
