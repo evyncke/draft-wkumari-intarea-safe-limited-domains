@@ -86,7 +86,7 @@ can significantly reduce the operational and security risks associated with
 limited domain protocols.
 
 These mechanisms are not applicable to all protocols intended for use in a
-limited domain, but if implemented on certain classes of protocols, they  can
+limited domain, but if implemented on certain classes of protocols, can
 significantly reduce the risks.
 
 
