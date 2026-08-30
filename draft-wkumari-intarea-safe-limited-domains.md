@@ -44,16 +44,21 @@ author:
 normative:
   RFC8799:
 informative:
+  RFC2784:
   RFC3031:
   RFC3682:
   RFC3927:
   RFC4291:
   RFC5771:
   RFC7665:
+  RFC8085:
+  RFC8754:
+  RFC8926:
   RFC8994:
   RFC8995:
   RFC9378:
   RFC9542:
+  RFC9674:
   IESG_EtherType:
     title: IESG Statement on EtherTypes
     author:
@@ -364,6 +369,30 @@ relative to the use of the Extended EtherType with a protocol number under the
 IANA OUI.
 
 
+# Non-Ethernet Encapsulations and Layer-3 Overlays
+
+Many modern data centers, enterprise networks, and WANs deploy limited-domain
+features across routed multi-hop IP underlays using Layer-3 encapsulations
+(such as Geneve {{RFC8926}}, VXLAN-GPE {{RFC9674}}, GRE {{RFC2784}}, or generic
+UDP encapsulation {{RFC8085}}).
+
+When designing limited-domain protocols for Layer-3 overlay environments, the
+same fundamental tension between fail-open and fail-closed designs applies:
+
+## The Fragility of IP-Level Filtering in Overlays
+
+Tunneling limited-domain traffic inside standard unicast IP/UDP
+packets without domain-specific transport identifiers exposes the traffic to
+the same leakage risks as native IP:
+
+1. **Routability by Default**: If an inner packet is encapsulated in a standard
+   UDP/IP header destined for an IP address that leaks into the global routing
+   table, intermediate underlay routers will forward the encapsulated frame
+   across domain boundaries unless explicitly filtered.
+2. **Transit Inspection Invisibility**: Intermediate nodes that inspect only
+   the outer IP/UDP headers cannot distinguish between legitimate transit
+   traffic and sensitive limited-domain control payloads.
+
 
 # Security Considerations
 
@@ -375,6 +404,7 @@ violating intended security constraints. The use of a layer-2 protocol
 identifier to provide a "fail closed" barrier at the domain border can
 significantly improve security by eliminating the opportunity for such
 misinterpretation.
+
 
 # IANA Considerations
 
@@ -408,3 +438,51 @@ forgotten some of them. Apologies if you were one of them.
 * 00-01:
   * Deborah pointed out that "this only works for transport-type limited domain
     protocols (e.g., SRv6)" could be read as SRv6 fails-closed.
+
+# Appendix A: Structural vs. Policy-Enforced Boundaries (MPLS vs. SRv6)
+{:numbered="false"}
+
+To illustrate the difference between fail-open and fail-closed designs,
+consider MPLS and Segment Routing over IPv6 (SRv6, {{RFC8754}}).
+
+## MPLS: Structural Fail-Closed Isolation
+{:numbered="false"}
+
+MPLS provides an automatic fail-closed boundary by virtue of its Layer-2
+encapsulation:
+
+* **Distinct Protocol Identifier**: MPLS frames utilize dedicated EtherTypes
+  (0x8847 for unicast, 0x8848 for multicast).
+* **Interface Enablement Requirement**: A node will only process or forward
+  MPLS frames on interfaces where MPLS forwarding is explicitly enabled.
+* **Drop by Default**: If an MPLS-encapsulated packet is accidentally
+  transmitted across a domain boundary to an un-configured interface, transit
+  provider, or peering exchange, the receiving hardware cannot parse the
+  payload as native IP and discards the frame at line rate.
+
+Because the forwarding plane requires explicit protocol support and state at
+each hop, MPLS fails closed in the presence of configuration errors or
+interface miswiring.
+
+## SRv6: Policy-Enforced Fail-Open Exposure
+{:numbered="false"}
+
+In contrast, SRv6 encapsulates domain-internal routing instructions within
+standard IPv6 headers:
+
+* **Standard Layer-2 Demuxing**: SRv6 packets utilize standard IPv6 EtherType
+  (0x86DD) and standard IPv6 Next Header values.
+* **Global Forwarding Compatibility**: Any standard IPv6 router along a path
+  will forward an SRv6 packet using ordinary routing procedures on the IPv6
+  Destination Address, regardless of whether that router participates in or
+  recognizes Segment Routing.
+* **Reliance on Perimeter ACLs**: As described in Section 5 of {{RFC8754}},
+  preventing SRv6 packets from leaking outside the trusted domain (or
+  preventing external packets from injecting unauthorized SIDs into the domain)
+  requires strict, comprehensive ingress and egress filtering at every
+  perimeter boundary.
+
+If an edge filter is omitted, truncated due to TCAM limits, or temporarily
+removed during debugging, the network fails open: domain-internal packets are
+forwarded across the public Internet, and untrusted external entities may
+address internal function SIDs directly.
