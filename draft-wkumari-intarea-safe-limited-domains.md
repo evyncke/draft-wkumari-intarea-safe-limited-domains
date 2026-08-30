@@ -424,7 +424,15 @@ forgotten some of them. Apologies if you were one of them.
 
 # Changelog
 {:numbered="false"}
-* -01-03:
+* - 02-07:
+  * Add Security Considerations text about the risks of fail-open protocols and
+    the benefits of fail-closed protocols.
+  * Added Appendix contrasting MPLS and SRv6.
+  * Added hardware processing notes.
+    * Used Gemini to help me reformulate mess into something readable.
+  * Rewrite Abstract.
+
+* -02-03:
   * Add Security Considerations text about the risks of fail-open protocols and
     the benefits of fail-closed protocols.
 
